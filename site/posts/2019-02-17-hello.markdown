@@ -1,0 +1,28 @@
+---
+layout: post
+title: Hello World
+date: 2019-02-17 11:27
+comments: true
+tags: foo, bar
+---
+
+Hello World
+
+<canvas id="boo"></canvas>
+<script type="text/javascript">
+renderer = new Vex.Flow.Renderer(document.getElementById('boo'), Vex.Flow.Renderer.Backends.CANVAS)
+artist = new Artist(10, 5, 200)
+vextab = new VexTab(artist)
+vextab.parse("\ntabstave clef=treble notation=true time=4/4 tablature=false\nnotes (C/4.E/4.G/4)");
+artist.render(renderer);
+</script>
+
+<canvas id="boo2"></canvas>
+<script type="text/javascript">
+renderer = new Vex.Flow.Renderer(document.getElementById('boo2'), Vex.Flow.Renderer.Backends.CANVAS)
+artist = new Artist(10, 5, 200)
+vextab = new VexTab(artist)
+vextab.parse("\ntabstave clef=treble notation=true time=4/4 tablature=false\nnotes (C/4.Eb/4.G/4) :8 C-Eb-G/5");
+artist.render(renderer);
+</script>
+
