@@ -8,23 +8,28 @@ tags: foo, bar
 
 Hello World
 
-<canvas id="boo" class="music"></canvas>
-<script type="text/javascript">
-var renderer = new Vex.Flow.Renderer(document.getElementById('boo'), Vex.Flow.Renderer.Backends.CANVAS)
-var artist = new Artist(10, 5, 200)
-var vextab = new VexTab(artist)
-vextab.parse("\ntabstave clef=treble notation=true tablature=false\nnotes (C/4.E/4.G/4)");
-artist.render(renderer);
-</script>
+$$
+C/4
+D/4
+E/4
+F/4
+G/4
+A/4
+B/4
+$$
 
-ok
+$$
+!Chord' (Maj C)
+!Chord' (Min D)
+!Chord' (Min E)
+(E/4.G/4.B/4)
+(F/4.A/4.C/5)
+(G/4.B/4.D/5)
+(A/4.C/5.E/5)
+(B/4.D/5.F/5)
+$$
 
-<canvas id="boo2" class="music"></canvas>
-<script type="text/javascript">
-var renderer = new Vex.Flow.Renderer(document.getElementById('boo2'), Vex.Flow.Renderer.Backends.CANVAS)
-var artist = new Artist(10, 5, 200)
-var vextab = new VexTab(artist)
-vextab.parse("\ntabstave clef=treble notation=true tablature=false\nnotes (E/4.G/4.C/5)");
-artist.render(renderer);
-</script>
+Nice
+
+$(C/3.E/4.G/5)$
 

@@ -23,6 +23,7 @@ import           GHC.Exts (fromList)
 import           SitePipe hiding (getTags)
 import           Text.Pandoc.Options
 import           Utils
+import MusicCompiler
 
 
 postFormat :: String
@@ -56,7 +57,7 @@ main = site $ do
                   & _Object . at "date"          ?~ _String . _Text # ""
 
   rawPosts <- sortBy (comparing (^?! l))
-          <$> resourceLoader markdownReader ["posts/*.markdown"]
+          <$> resourceLoader musicReader ["posts/*.markdown"]
 
   let urls = fmap (^?! l) rawPosts
       getEm' = getNextAndPrev urls
