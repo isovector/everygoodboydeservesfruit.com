@@ -26,8 +26,6 @@ executable poly
                   , old-locale
                   , regex-compat
                   , time
-                  , diagrams
-                  , circuitry
                   , directory
                   , temporary
                   , process

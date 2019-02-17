@@ -141,6 +141,7 @@ main = site $ do
     [ "css"
     , "js"
     , "images"
+    , "scripts"
     ]
 
   copyFilesWith (drop 7) [ "static/*" ]
