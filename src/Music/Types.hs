@@ -111,11 +111,12 @@ instance Show Note where
   show G   = "G"
   show A   = "A"
   show B   = "B"
-  show a   = foldNote (show . fromNoteClass . toNoteClass) (++ "b") (++ "#") a
+  show a   = foldNote (show . fromNoteClass . toNoteClass) (++ "♭") (++ "♯") a
+
 
 -- TODO(sandy): flats are broken
 instance Engrave Note where
-  engrave = show
+  engrave = foldNote show (++ "@") (++ "#")
 
 foldNote :: (Note -> a) -> (a -> a) -> (a -> a) -> Note -> a
 foldNote f _ _ C   =         f C
@@ -289,7 +290,7 @@ data Roman
   | V
   | VI
   | VII
-  deriving (Eq, Ord, Enum, Show, Generic, Bounded)
+  deriving (Eq, Ord, Enum, Show, Generic, Bounded, Read)
 
 data Inversion = First | Second | Third | Fourth
   deriving (Eq, Ord, Show, Enum, Bounded, Generic, Read)
@@ -307,7 +308,22 @@ data Interval
   | Maj6
   | Min7
   | Maj7
-  deriving (Eq, Ord, Show, Enum, Bounded, Generic, Read)
+  deriving (Eq, Ord, Enum, Bounded, Generic, Read)
+
+
+instance Show Interval where
+  show Unison = "U"
+  show Min2 = "m2"
+  show Maj2 = "M2"
+  show Min3 = "m3"
+  show Maj3 = "M3"
+  show Perf4 = "P4"
+  show Tritone = "TT"
+  show Perf5 = "P5"
+  show Min6 = "m6"
+  show Maj6 = "M6"
+  show Min7 = "m7"
+  show Maj7 = "M7"
 
 intervalSize :: Interval -> Roman
 intervalSize Unison  = I
@@ -316,7 +332,7 @@ intervalSize Maj2    = II
 intervalSize Min3    = III
 intervalSize Maj3    = III
 intervalSize Perf4   = IV
-intervalSize Tritone = IV
+intervalSize Tritone = V
 intervalSize Perf5   = V
 intervalSize Min6    = VI
 intervalSize Maj6    = VI

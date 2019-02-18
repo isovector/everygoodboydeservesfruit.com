@@ -31,6 +31,7 @@ executable poly
                   , regex-tdfa
                   , transformers
                   , mtl
+                  , exceptions
                   , syb
                   , interpolatedstring-perl6
                   , MissingH

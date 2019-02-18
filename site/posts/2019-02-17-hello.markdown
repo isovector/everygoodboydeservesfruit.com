@@ -22,14 +22,23 @@ $$
 !Chord' (Maj C)
 !Chord' (Min D)
 !Chord' (Min E)
-(E/4.G/4.B/4)
-(F/4.A/4.C/5)
-(G/4.B/4.D/5)
-(A/4.C/5.E/5)
-(B/4.D/5.F/5)
+!Chord' (Maj F)
+!Chord' (Maj G)
+!Chord' (Min A)
+!Chord' (Dim B)
 $$
 
-Nice
+$$
+!Chord (Maj C) 4 First
+!Chord (Maj F) 4 First
+!Chord (Maj G) 4 First
+!Chord (Maj C) 4 First
+|
+!Chord (Maj C) 4 First
+!Chord (Maj F) 4 Third
+!Chord (Maj G) 3 Second
+!Chord (Maj C) 4 First
+$$
 
-$(C/3.E/4.G/5)$
+Nice $Maj7C Ab$ bro.
 
