@@ -6,7 +6,7 @@ comments: true
 tags: foo, bar
 ---
 
-Hello World
+Hello World. This is me testing out some of my mathematical models of music.
 
 $$
 C/4
@@ -17,6 +17,9 @@ G/4
 A/4
 B/4
 $$
+
+It's just a reference to me to remember how to do things on my new platform.
+I'll take it down soon.
 
 $$
 !Chord' (Maj C)
