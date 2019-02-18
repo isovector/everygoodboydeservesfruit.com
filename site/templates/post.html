@@ -1,29 +1,8 @@
 {{> templates/header.html}}
 
 <article>
-<header>
   <h1><a href="/{{canonical_url}}">{{title}}</a></h1>
-</header>
-<p class="meta">
-    {{#has_prev}}
-    <span class="prev">
-        <a href="/blog/{{prev}}">&larr;</a>
-    </span>
-    {{/has_prev}}
-    {{#has_next}}
-    <span class="next">
-        <a href="/blog/{{next}}">&rarr;</a>
-    </span>
-    {{/has_next}}
-    <time>{{date}}</time>
-
-    <span class="tags">
-        {{{html_tags}}}
-    </span>
-</p>
-<div class="content">
     {{{content}}}
-</div>
 
 <div class="comments">
     <div id="disqus_thread"></div>

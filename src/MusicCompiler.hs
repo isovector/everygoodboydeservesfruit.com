@@ -40,7 +40,7 @@ musicReader s = do
     tt ioref (Para [Math DisplayMath z]) = do
       n <- readIORef ioref
       modifyIORef ioref (+1)
-      pure $ RawBlock (Format "html") $ [qc|
+      pure . Para . pure . RawInline (Format "html") $ [qc|
 <canvas class="music" id="music-{n}"></canvas>
 <script type="text/javascript">
 var renderer = new Vex.Flow.Renderer(document.getElementById('music-{n}'), Vex.Flow.Renderer.Backends.CANVAS)
