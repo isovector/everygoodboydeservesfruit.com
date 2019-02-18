@@ -1,0 +1,59 @@
+---
+layout: post
+title: rhythm-1
+date: 2019-02-18 16:57
+comments: true
+tags: foo, bar
+---
+
+
+> Perhaps the most fundamental approach to improvisation emphasizes rhythm,
+> commonly known in the jazz community as time or time-feel.
+>
+> -Paul F. Berliner, Thinking in Jazz
+
+> I hear rhythms, mostly, and then I put notes to them.
+>
+> -Dizzy Gillespie
+
+It's said that music is made up of three fundamental pieces---the rhythm, the
+harmony, and the melody. If you had asked me a month ago which of these was the
+most important, I'd unhesitatingly say "the melody."
+
+I was wrong. It's the rhythm. Music without melody is sorta boring, but music
+without rhythm isn't music at all---it's just noise.
+
+When I began seriously studying music, I couldn't hold a beat to save my life. A
+lifetime of playing classical music meant that *continuity* was never as
+important to me as *playing the right notes.* As such, whenever I screwed up,
+I'd stop and start again from the top. As you can imagine, this was not
+particularly helpful for my sense of rhythm.
+
+Do you know what was? Playing with the metronome. A lot.
+
+> You should have the metronome on, eyes closed, standing up and getting inside
+> of that pulse like you could eat it, chew it, punch it, sweat it. Feel it like
+> it’s right there, like it’s tangible.
+>
+> To do this requires that you never practice without a metronome.
+>
+> For roughly 15 years I have never picked up a guitar without a metronome on,
+> and now, to me, the sound of the metronome is the sound of practicing.
+>
+> -Brian Baker
+
+```protip
+Starting today, *every time you practice,* use the metronome for the entire
+session.
+```
+
+It's amazing what having the right groove can do to a song. I was ignoring this
+for the two years I was teaching myself guitar. Even if you're playing the right
+chords, it just doesn't sound like the right song until the beat is in place.
+
+So focus on the groove.
+
+$$
+X/4 X/4 X/4 X/4
+$$
+
