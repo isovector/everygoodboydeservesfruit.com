@@ -110,3 +110,7 @@ footer {
 .date {
   float: right;
 }
+
+.comments {
+  margin-top: 3em;
+}
