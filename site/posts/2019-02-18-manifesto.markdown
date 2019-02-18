@@ -1,6 +1,6 @@
 ---
 layout: post
-title: intro
+title: Manifesto
 date: 2019-02-18 00:33
 comments: true
 tags: foo, bar
