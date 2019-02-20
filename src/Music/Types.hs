@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveFunctor       #-}
 {-# LANGUAGE DeriveGeneric       #-}
 {-# LANGUAGE FlexibleInstances   #-}
+{-# LANGUAGE QuasiQuotes         #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE StandaloneDeriving  #-}
 {-# LANGUAGE TupleSections       #-}
@@ -15,6 +16,7 @@ import Data.List (intercalate)
 import Debug.Trace
 import GHC.Generics
 import Data.Monoid ((<>))
+import Text.InterpolatedString.Perl6 (qc)
 
 class Engrave a where
   engrave :: a -> String
@@ -113,6 +115,8 @@ instance Show Note where
   show B   = "B"
   show a   = foldNote (show . fromNoteClass . toNoteClass) (++ "♭") (++ "♯") a
 
+uglyShowNote :: Note -> String
+uglyShowNote = foldNote show (++ "b") (++ "#")
 
 -- TODO(sandy): flats are broken
 instance Engrave Note where
@@ -220,12 +224,20 @@ data Command
   = Chord (ChordV Note) Int Inversion
   | Chord' (ChordV Note)
   | Note Note
+  | Preamble Clef (Maybe (Int, Int)) (Maybe Note)
   deriving (Eq, Ord, Read)
 
 instance Show Command where
-  show (Chord' c) = show c
+  show (Chord' c)    = show c
   show (Chord c _ _) = show c
   show (Note n)      = show n
+  show (Preamble _ _ _ ) = error "don't show a preamble"
+
+
+data Clef
+  = Treble
+  | Bass
+  deriving (Eq, Ord, Read, Show)
 
 
 data ChordV a
@@ -381,6 +393,10 @@ invert i n = iterate rotate n !! fromEnum i
 instance Engrave (Note, Int) where
   engrave (n, i) = engrave n ++ "/" ++ show i
 
+instance Engrave Clef where
+  engrave Treble = "treble"
+  engrave Bass   = "bass"
+
 instance Engrave Command where
   engrave (Chord' c) = engrave $ Chord c 4 First
   engrave (Chord c o i)
@@ -392,5 +408,12 @@ instance Engrave Command where
       . invert i
       $ notesOf c
   engrave (Note n) = engrave (n, 4 :: Int)
-
+  engrave (Preamble c ts key) =
+    mconcat
+      [ "tabstave notation=true tablature=false clef="
+      , engrave c
+      , maybe "" (\(n, d) -> [qc| time={n}/{d}|]) ts
+      , maybe "" (\k -> [qc| key={uglyShowNote k}|]) key
+      , "!!!!!"
+      ]
 

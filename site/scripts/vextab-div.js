@@ -95,19 +95,19 @@ switch (yystate) {
 case 1:
 
       return $$[$0-1];
-    
+
 break;
 case 2: case 17: case 79:
- this.$ = null 
+ this.$ = null
 break;
 case 3: case 12: case 18: case 23: case 25: case 26: case 27: case 42: case 59: case 60: case 61: case 62: case 67:
- this.$ = $$[$0] 
+ this.$ = $$[$0]
 break;
 case 4: case 83:
- this.$ = [$$[$0]] 
+ this.$ = [$$[$0]]
 break;
 case 5:
- this.$ = [].concat($$[$0-1], $$[$0]) 
+ this.$ = [].concat($$[$0-1], $$[$0])
 break;
 case 6:
  this.$ = {
@@ -118,7 +118,7 @@ case 6:
         _l: _$[$0-2].first_line,
         _c: _$[$0-2].first_column
       }
-    
+
 break;
 case 7:
  this.$ = {
@@ -127,7 +127,7 @@ case 7:
         _l: _$[$0-1].first_line,
         _c: _$[$0-1].first_column
       }
-    
+
 break;
 case 8:
 
@@ -137,7 +137,7 @@ case 8:
         _l: _$[$0-1].first_line,
         _c: _$[$0-1].first_column
       }
-    
+
 break;
 case 13:
 
@@ -145,7 +145,7 @@ case 13:
       var notes = [].concat($$[$0-1].notes, $$[$0].notes);
       var slurs = [].concat($$[$0-1].slurs, $$[$0].slurs)
       this.$ = {text: text, notes: notes, slurs: slurs};
-    
+
 break;
 case 14:
 this.$ = {text: $$[$0], notes: [], slurs: []}
@@ -163,7 +163,7 @@ case 19:
         _l: _$[$0-2].first_line,
         _c: _$[$0-2].first_column
       }]
-    
+
 break;
 case 20:
  this.$ = [].concat($$[$0-3], [{
@@ -172,16 +172,16 @@ case 20:
         _l: _$[$0-2].first_line,
         _c: _$[$0-2].first_column
         }])
-    
+
 break;
 case 21:
- this.$ = [{text: $$[$0], _l: _$[$0].first_line, _c: _$[$0].first_column}] 
+ this.$ = [{text: $$[$0], _l: _$[$0].first_line, _c: _$[$0].first_column}]
 break;
 case 22:
- this.$ = [].concat($$[$0-2], {text: $$[$0], _l: _$[$0].first_line, _c: _$[$0].first_column}) 
+ this.$ = [].concat($$[$0-2], {text: $$[$0], _l: _$[$0].first_line, _c: _$[$0].first_column})
 break;
 case 24:
- this.$ = [].concat($$[$0-1], $$[$0])  
+ this.$ = [].concat($$[$0-1], $$[$0])
 break;
 case 28:
  this.$ = [{
@@ -190,7 +190,7 @@ case 28:
         _l: _$[$0].first_line,
         _c: _$[$0].first_column
         }]
-    
+
 break;
 case 29:
  this.$ = [{
@@ -198,7 +198,7 @@ case 29:
         _l: _$[$0].first_line,
         _c: _$[$0].first_column
       }]
-    
+
 break;
 case 30:
  this.$ = [{
@@ -206,7 +206,7 @@ case 30:
         _l: _$[$0].first_line,
         _c: _$[$0].first_column
       }]
-    
+
 break;
 case 31:
  this.$ = [{
@@ -215,7 +215,7 @@ case 31:
         _l: _$[$0].first_line,
         _c: _$[$0].first_column
       }]
-    
+
 break;
 case 32:
  this.$ = [{
@@ -224,7 +224,7 @@ case 32:
         _l: _$[$0].first_line,
         _c: _$[$0].first_column
       }]
-    
+
 break;
 case 33:
  this.$ = [{
@@ -233,7 +233,7 @@ case 33:
         _l: _$[$0].first_line,
         _c: _$[$0].first_column
       }]
-    
+
 break;
 case 34:
 
@@ -241,48 +241,48 @@ case 34:
         command: "rest",
         params: $$[$0]
       }]
-    
+
 break;
 case 35:
- this.$ = 'single' 
+ this.$ = 'single'
 break;
 case 36:
- this.$ = 'double' 
+ this.$ = 'double'
 break;
 case 37:
- this.$ = 'end' 
+ this.$ = 'end'
 break;
 case 38:
- this.$ = 'repeat-end' 
+ this.$ = 'repeat-end'
 break;
 case 39:
- this.$ = 'repeat-begin' 
+ this.$ = 'repeat-begin'
 break;
 case 40:
- this.$ = 'repeat-both' 
+ this.$ = 'repeat-both'
 break;
 case 41:
 
       _.extend(_.last($$[$0-3]), {decorator: $$[$0-2]})
       _.each($$[$0-3], function(fret) { fret['string'] = $$[$0] })
       this.$ = $$[$0-3]
-    
+
 break;
 case 43: case 84:
- this.$ = [].concat($$[$0-2], $$[$0]) 
+ this.$ = [].concat($$[$0-2], $$[$0])
 break;
 case 44:
- this.$ = [{chord: $$[$0-2], decorator: $$[$0]}] 
+ this.$ = [{chord: $$[$0-2], decorator: $$[$0]}]
 break;
 case 45:
- this.$ = [{chord: $$[$0-2], articulation: $$[$0-4], decorator: $$[$0]}] 
+ this.$ = [{chord: $$[$0-2], articulation: $$[$0-4], decorator: $$[$0]}]
 break;
 case 46:
  this.$ = [{
         fret: $$[$0],
         _l: _$[$0].first_line,
         _c: _$[$0].first_column}]
-    
+
 break;
 case 47:
  this.$ = [{abc: $$[$0], _l: _$[$0].first_line, _c: _$[$0].first_column}]
@@ -292,7 +292,7 @@ case 48:
              fret: $$[$0], _l: _$[$0-3].first_line, _c: _$[$0-3].first_column}]
 break;
 case 49:
- this.$ = [_.extend($$[$0], {articulation: $$[$0-1]})] 
+ this.$ = [_.extend($$[$0], {articulation: $$[$0-1]})]
 break;
 case 50:
 
@@ -300,7 +300,7 @@ case 50:
       _.extend($$[$0], {articulation: $$[$0-1]})
       $$[$0-3].push($$[$0])
       this.$ = $$[$0-3]
-    
+
 break;
 case 51:
  this.$ = {
@@ -308,7 +308,7 @@ case 51:
       _l: _$[$0-4].first_line, _c: _$[$0-4].first_column}
 break;
 case 52:
- this.$ = {fret: $$[$0], _l: _$[$0].first_line, _c: _$[$0].first_column} 
+ this.$ = {fret: $$[$0], _l: _$[$0].first_line, _c: _$[$0].first_column}
 break;
 case 53:
  this.$ = {time: $$[$0-3], dot: $$[$0-2], abc: $$[$0]}
@@ -317,101 +317,101 @@ case 54:
  this.$ = {time: $$[$0-6], dot: $$[$0-5], abc: $$[$0-3], octave: $$[$0-2], fret: $$[$0]}
 break;
 case 55:
- this.$ = {abc: $$[$0], _l: _$[$0].first_line, _c: _$[$0].first_column} 
+ this.$ = {abc: $$[$0], _l: _$[$0].first_line, _c: _$[$0].first_column}
 break;
 case 56:
  this.$ = {abc: $$[$0-3], octave: $$[$0-2],
-            fret: $$[$0], _l: _$[$0-3].first_line, _c: _$[$0-3].first_column} 
+            fret: $$[$0], _l: _$[$0-3].first_line, _c: _$[$0-3].first_column}
 break;
 case 57:
- this.$ = {time: $$[$0-1], dot: $$[$0]} 
+ this.$ = {time: $$[$0-1], dot: $$[$0]}
 break;
 case 58:
- this.$ = $$[$0-1] + $$[$0] 
+ this.$ = $$[$0-1] + $$[$0]
 break;
 case 63:
- this.$ = false 
+ this.$ = false
 break;
 case 64:
- this.$ = true 
+ this.$ = true
 break;
 case 65:
- this.$ = '' 
+ this.$ = ''
 break;
 case 66: case 69:
- this.$ = 's' 
+ this.$ = 's'
 break;
 case 68:
- this.$ = '-' 
+ this.$ = '-'
 break;
 case 70:
- this.$ = 't' 
+ this.$ = 't'
 break;
 case 71:
- this.$ = 'T' 
+ this.$ = 'T'
 break;
 case 72:
- this.$ = 'b' 
+ this.$ = 'b'
 break;
 case 73:
- this.$ = 'h' 
+ this.$ = 'h'
 break;
 case 74:
- this.$ = 'p' 
+ this.$ = 'p'
 break;
 case 75:
- this.$ = 'v' 
+ this.$ = 'v'
 break;
 case 76:
- this.$ = 'V' 
+ this.$ = 'V'
 break;
 case 77:
- this.$ = 'u' 
+ this.$ = 'u'
 break;
 case 78:
- this.$ = 'd' 
+ this.$ = 'd'
 break;
 case 80:
- this.$ = {tuplet: $$[$0-1]} 
+ this.$ = {tuplet: $$[$0-1]}
 break;
 case 81:
- this.$ = {tuplet: $$[$0-3], notes: $$[$0-1]} 
+ this.$ = {tuplet: $$[$0-3], notes: $$[$0-1]}
 break;
 case 82: case 85:
- this.$ = $$[$0-1] 
+ this.$ = $$[$0-1]
 break;
 case 86:
- this.$ = {position: 0} 
+ this.$ = {position: 0}
 break;
 case 87:
- this.$ = {position: $$[$0-1]} 
+ this.$ = {position: $$[$0-1]}
 break;
 case 88:
- this.$ = {position: $$[$0-1] * -1} 
+ this.$ = {position: $$[$0-1] * -1}
 break;
 case 89:
- this.$ = {key: $$[$0-2], accidental: $$[$0-1], accidental_type: $$[$0]} 
+ this.$ = {key: $$[$0-2], accidental: $$[$0-1], accidental_type: $$[$0]}
 break;
 case 90:
- this.$ = "#" 
+ this.$ = "#"
 break;
 case 91:
- this.$ = "##" 
+ this.$ = "##"
 break;
 case 92:
- this.$ = "b" 
+ this.$ = "b"
 break;
 case 93:
- this.$ = "bb" 
+ this.$ = "bb"
 break;
 case 94:
- this.$ = "n" 
+ this.$ = "n"
 break;
 case 96:
- this.$ = null; 
+ this.$ = null;
 break;
 case 97:
- this.$ = "c" 
+ this.$ = "c"
 break;
 }
 },
@@ -897,31 +897,31 @@ options: {},
 performAction: function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
 var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
-case 0: this.begin('notes'); return 19; 
+case 0: this.begin('notes'); return 19;
 break;
-case 1: this.begin('options'); return 13; 
+case 1: this.begin('options'); return 13;
 break;
-case 2: this.begin('options'); return 14; 
+case 2: this.begin('options'); return 14;
 break;
-case 3: this.begin('options'); return 15; 
+case 3: this.begin('options'); return 15;
 break;
-case 4: this.begin('options'); return 11; 
+case 4: this.begin('options'); return 11;
 break;
-case 5: this.begin('text'); return 17; 
+case 5: this.begin('text'); return 17;
 break;
-case 6: this.begin('options'); return 21; 
+case 6: this.begin('options'); return 21;
 break;
 case 7:return 22
 break;
-case 8: this.begin('annotations'); return "$" 
+case 8: this.begin('annotations'); return "$"
 break;
-case 9: this.begin('notes'); return "$" 
+case 9: this.begin('notes'); return "$"
 break;
 case 10:return 22
 break;
-case 11: this.begin('command'); return "!" 
+case 11: this.begin('command'); return "!"
 break;
-case 12: this.begin('notes'); return "!" 
+case 12: this.begin('notes'); return "!"
 break;
 case 13:return 74
 break;
@@ -997,7 +997,7 @@ case 48:return 80
 break;
 case 49:return 81
 break;
-case 50: this.begin('INITIAL'); 
+case 50: this.begin('INITIAL');
 break;
 case 51:/* skip whitespace */
 break;
@@ -46441,7 +46441,7 @@ Artist = (function() {
     }
   };
 
-  Artist.NOLOGO = false;
+  Artist.NOLOGO = true;
 
   function Artist(x, y, width1, options) {
     this.x = x;
@@ -46481,8 +46481,6 @@ Artist = (function() {
       "accidentals": "standard",
       "tab-stems": "false",
       "tab-stem-direction": "up",
-      "beam-rests": "true",
-      "beam-stemlets": "true",
       "beam-middle-only": "false",
       "connector-space": 5
     };

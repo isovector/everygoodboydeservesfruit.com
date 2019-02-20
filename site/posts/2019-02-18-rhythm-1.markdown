@@ -54,6 +54,8 @@ chords, it just doesn't sound like the right song until the beat is in place.
 So focus on the groove.
 
 $$
-X/4 X/4 X/4 X/4
+X-X-X-X/4 |
+X-X/4 :8 X-X-X/4 ^3^ :q X/4 |
+:8 ## X/4 :q X/4 ## :8 X-X-X/4 ^3^
 $$
 

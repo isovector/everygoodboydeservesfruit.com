@@ -10,6 +10,7 @@ import Control.Monad.Catch
 import Data.Char (isSpace)
 import Data.Coerce (coerce)
 import Data.IORef
+import Data.List (isInfixOf)
 import Data.List.Utils (replace)
 import Data.Maybe (listToMaybe, fromJust)
 import Data.Monoid (First (..))
@@ -44,9 +45,9 @@ musicReader s = do
 <canvas class="music" id="music-{n}"></canvas>
 <script type="text/javascript">
 var renderer = new Vex.Flow.Renderer(document.getElementById('music-{n}'), Vex.Flow.Renderer.Backends.CANVAS)
-var artist = new Artist(10, 5, 400)
+var artist = new Artist(10, 5, 600)
 var vextab = new VexTab(artist)
-vextab.parse("\ntabstave clef=treble notation=true tablature=false\nnotes {escape z}");
+vextab.parse("\n{escape z}");
 artist.render(renderer);
 </script>
       |]
@@ -64,7 +65,19 @@ doCommand z = z
 
 
 escape :: String -> String
-escape = replace "\n" " " . unlines . fmap doCommand . lines . dropWhile isSpace
+escape = replace "!!!!!" "\\nnotes "
+       . addPreamble
+       . replace "\n" " "
+       . unlines
+       . fmap doCommand
+       . lines
+       . dropWhile isSpace
+
+
+addPreamble :: String -> String
+addPreamble s
+  | "!!!!!" `isInfixOf` s = s
+  | otherwise = "tabstave notation=true tablature=false clef=treble!!!!!" ++ s
 
 
 mkPandocReaderWith
