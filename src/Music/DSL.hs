@@ -19,6 +19,7 @@ import           Data.Foldable
 import           Data.Generics.Product
 import           Data.List (intercalate)
 import qualified Data.Map as M
+import           Data.Maybe
 import           Data.Proxy
 import           Data.Semigroup
 import           Data.Typeable
@@ -41,10 +42,11 @@ data Stave
   | SGroup [Stave]
   deriving (Eq, Ord, Show, Read, Data, Typeable)
 
-data Line deriving (Typeable)
 
+data Line deriving (Typeable)
 data Voice deriving (Typeable)
 data StaveNote deriving (Typeable)
+data Formatter deriving (Typeable)
 
 instance Semigroup Stave where
   SGroup s1 <> SGroup s2 = SGroup $ s1 <> s2
@@ -86,33 +88,41 @@ instance Semigroup Element where
   s1 <> s2               = EGroup [s1, s2]
 
 
-
 withClef :: Clef -> Stave -> Stave
 withClef c = everywhere $ mkT $ const $ Just c
+
 
 withKey :: Note -> Stave -> Stave
 withKey k = everywhere $ mkT $ \(Stave c _ t e) -> Stave c (Just k) t e
 
+
 withTimeSig :: Int -> Int -> Stave -> Stave
 withTimeSig t b = everywhere $ mkT $ const $ Just (t, b)
 
+
 chord :: ChordV Note -> Int -> Inversion -> Element
-chord c o i = EChord c o i $ pure $ (, D4) $ [0 .. length $ notesOf c]
+chord c o i = EChord c o i $ pure $ (, D4) $ [0 .. length (notesOf c) - 1]
+
 
 note :: Note -> Int -> Element
 note n o = ENote n o D4
 
+
 rest :: Element
 rest = ERest D4
+
 
 dur :: Dur -> Element -> Element
 dur d = everywhere $ mkT $ const d
 
+
 annotate :: String -> Element -> Element
 annotate = undefined
 
+
 bars :: Element -> Stave
 bars = Stave Nothing Nothing Nothing
+
 
 type JSM = State JSState
 
@@ -124,10 +134,12 @@ data JSState = JSState
   }
   deriving (Eq, Show, Ord, Read, Generic)
 
+
 runJSM :: JSM a -> String
 runJSM js =
   let jss = execState js $ JSState "" [] 0 mempty
-   in jssContent jss ++ join (jssDrawQueue jss)
+   in jssContent jss ++ intercalate "\n" (jssDrawQueue jss)
+
 
 freshName :: forall a. Typeable a => JSM (JS a)
 freshName = do
@@ -143,16 +155,26 @@ typeName = fmap (\x -> bool '_' x $ isAlphaNum x)
          $ Proxy @a
 
 
+context :: JS ()
+context = JS "ctx"
+
+
 emit :: String -> JSM ()
 emit e = modify $ field @"jssContent" <>~ e <> "\n"
 
 
 emitDraw :: JS a -> JSM ()
 emitDraw (JS name) =
-  modify $ field @"jssDrawQueue" <>~ [[qc|{name}.setContext("ctx").draw();|]]
+  modify $ field @"jssDrawQueue" <>~ [[qc|{name}.setContext({context}).draw();|]]
+
+
+emitQueue :: String -> JSM ()
+emitQueue e = modify $ field @"jssDrawQueue" <>~ [e]
+
 
 drawClef :: JS Stave -> Clef -> JSM ()
 drawClef s c = emit [qc|{s}.addClef("{show c & _head %~ toLower}");|]
+
 
 drawTimeSig :: JS Stave -> (Int, Int) -> JSM ()
 drawTimeSig s (t, b) = emit [qc|{s}.addTimeSignature("{t}/{b}");|]
@@ -160,6 +182,11 @@ drawTimeSig s (t, b) = emit [qc|{s}.addTimeSignature("{t}/{b}");|]
 
 drawElement :: Element -> JSM (JS StaveNote)
 drawElement (ENote n o d) = drawNotes [(n, o)] d
+drawElement (EChord c o i [(ns, d)]) =
+  let chordNotes = inOctaves o $ invert i $ notesOf c
+      notes = fmap (chordNotes !!) ns
+   in drawNotes notes d
+
 
 drawNotes :: [(Note, Int)] -> Dur -> JSM (JS StaveNote)
 drawNotes notes d = do
@@ -176,6 +203,21 @@ drawNotes notes d = do
   case d of
     Dotted _ -> emit [qc|{v}.addDotToAll();|]
     _ -> pure ()
+
+  pure v
+
+
+drawVoice :: JS Stave -> [JS StaveNote] -> JSM (JS Voice)
+drawVoice stave sns = do
+  v <- freshName
+  let sns' = intercalate "," $ fmap show sns
+  emit [qc|var {v} = new VF.Voice();|]
+  emit [qc|{v}.addTickables({sns'});|]
+
+  fm <- freshName @Formatter
+  emit [qc|var {fm} = new VF.Formatter().joinVoices([{v}]).format([{v}], 400);|]
+
+  emitQueue [qc|{v}.draw({context}, {stave});|]
   pure v
 
 
@@ -191,10 +233,7 @@ doAccidentals v notes = do
 
 agrees :: M.Map Note Int -> Note -> Bool
 agrees m n =
-  case M.lookup (baseNote n) m of
-    Just x  -> x == adjustment n
-    Nothing -> True
-
+  adjustment n == fromMaybe 0 (M.lookup (baseNote n) m)
 
 
 accidentalsForKey :: Note -> M.Map Note Int
@@ -203,7 +242,6 @@ accidentalsForKey c =
    in M.fromList . fmap (\x -> ( baseNote x
                                , adjustment x))
                  $ filter ((/= 0) . adjustment) notes
-
 
 
 drawStave :: Stave -> JSM (JS Stave)
@@ -215,8 +253,10 @@ drawStave (Stave clef key timesig e) = do
   for_ key $ \k -> do
     modify $ field @"jssAccidentals" .~ accidentalsForKey k
     -- drawKey v k
+
   emitDraw v
 
-  drawElement e
+  sn <- drawElement e
+  drawVoice v [sn]
   pure v
 
