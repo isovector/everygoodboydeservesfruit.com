@@ -441,6 +441,7 @@ instance Engrave Command where
      in foldMap (engraveChord . fmap (notes !!)) d
 
 engraveChord :: [(Note, Int)] -> String
-engraveChord = ('(' :) . (++ ")") . intercalate "." . fmap engrave
+engraveChord [] = "##"
+engraveChord xs = ('(' :) . (++ ")") . intercalate "." $ fmap engrave xs
 
 

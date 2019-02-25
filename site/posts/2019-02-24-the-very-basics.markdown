@@ -1,9 +1,9 @@
 ---
 layout: post
-title: rhythm-1
-date: 2019-02-18 16:57
+title: "Getting Started: The Very Basics"
+date: 2019-02-24 22:25
 comments: true
-tags: foo, bar
+tags: basics, chords
 ---
 
 Let's get you up and running. Today we'll talk about enough of the very basics
@@ -41,7 +41,7 @@ instrument!
 Today we'll be looking at the song [Wagon Wheel][wagon], whose chord sheet looks
 like this:
 
-[wagon]:
+[wagon]: https://www.youtube.com/watch?v=hvKyBcCDOB4
 
 ```chords
 G | D | Em | C
@@ -130,4 +130,18 @@ $$
 |
 !Replicate 2 (Note D 3)
 $$
+
+It's sort of silly how much better a little embellishment sounds already, isn't
+it? We'll progress from here by looking at small, simple adornments can be
+quickly learned, and layered for great effect.
+
+**For practice**, familiarize yourself with playing songs and singing along to
+them. You can let your vocals carry most of the musical weight; for now your
+instrumentation is best considered as accompaniment. Practice with a metronome
+and make sure your chord changes are on the beat. Play music using both hands,
+and build independence between the two by playing them at different times. Find
+some other four-chord songs to play---[here's an easy and fun way to find some
+that you already know][fourchord].
+
+[fourchord]: https://www.youtube.com/watch?v=5pidokakU4I
 
