@@ -154,10 +154,11 @@ writeTemplate' :: ToJSON a => String -> [a] -> SiteM ()
 writeTemplate' a = writeTemplate ("templates/" <> a)
 
 
+pandocMathCompiler :: WriterOptions
 pandocMathCompiler =
   let mathExtensions =
           [ Ext_tex_math_dollars
-          , Ext_tex_math_double_backslash
+          , Ext_tex_math_single_backslash
           , Ext_latex_macros
           ]
       defaultExtensions = writerExtensions def
@@ -167,3 +168,4 @@ pandocMathCompiler =
           , writerHTMLMathMethod = MathJax ""
           }
    in writerOptions
+

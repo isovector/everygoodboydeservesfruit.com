@@ -102,7 +102,7 @@ footer {
   text-align: center;
 }
 
-.music {
+.music > canvas {
   display: block;
   margin: 0 auto;
 }
@@ -129,5 +129,28 @@ blockquote {
   background-repeat: no-repeat;
   text-indent: 23px;
   margin: 2em 4em
+}
+
+.chord-diagram {
+  border-collapse: separate;
+  margin: 0 auto;
+  border-spacing: 0px 30px;
+}
+.chord-diagram td {
+  border-right: 1px solid black;
+}
+.chord-diagram tr td {
+  border-top: 0;
+  border-bottom: 0;
+  margin-bottom: 1em;
+  width: 6em;
+  text-align: center;
+  height: 2em;
+}
+.chord-diagram tr td:first-child {
+  border-left: 0;
+}
+.chord-diagram tr td:last-child {
+  border-right: 0;
 }
 

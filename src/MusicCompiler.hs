@@ -9,9 +9,8 @@ module MusicCompiler (musicReader) where
 import Control.Monad.Catch
 import Data.Char (isSpace)
 import Data.Coerce (coerce)
-import Data.IORef
 import Data.List (isInfixOf)
-import Data.List.Utils (replace)
+import Data.List.Utils (replace, split)
 import Data.Maybe (listToMaybe, fromJust)
 import Data.Monoid (First (..))
 import Generics.SYB
@@ -22,10 +21,9 @@ import Text.Pandoc hiding (Inline (Note))
 
 musicReader :: String -> IO String
 musicReader s = do
-    ioref <- newIORef @Int 0
     mkPandocReaderWith
         readMarkdown
-        (fmap (fmap $ everywhere $ mkT inline) $ everywhereM $ mkM $ tt ioref)
+        (fmap (fmap $ everywhere $ mkT inline) $ everywhereM $ mkM tt)
         pandocToHTML s
   where
     inline (Math InlineMath z) =
@@ -38,20 +36,28 @@ musicReader s = do
         ]
     inline x = x
 
-    tt ioref (Para [Math DisplayMath z]) = do
-      n <- readIORef ioref
-      modifyIORef ioref (+1)
+    tt (Para [Math DisplayMath z]) =
       pure . Para . pure . RawInline (Format "html") $ [qc|
-<canvas class="music" id="music-{n}"></canvas>
-<script type="text/javascript">
-var renderer = new Vex.Flow.Renderer(document.getElementById('music-{n}'), Vex.Flow.Renderer.Backends.CANVAS)
-var artist = new Artist(10, 5, 600)
-var vextab = new VexTab(artist)
-vextab.parse("\n{escape z}");
-artist.render(renderer);
-</script>
+<div class="vex-tabdiv music">
+{escape z}
+</div>
       |]
-    tt _ x = pure x
+
+    tt (CodeBlock (_, ["chords"], _) doc) = do
+      let chords = fmap (split "|") $ lines doc
+      pure . Para . pure . RawInline (Format "html") $ mconcat
+        [ [qc|<table class="chord-diagram">|]
+        , flip foldMap chords $ \row -> mconcat
+            [ [qc|<tr>|]
+            , flip foldMap row $ \chord ->
+              [qc|<td>{chord}</td>|]
+            , [qc|</tr>
+              |]
+            ]
+        , [qc|</table>|]
+        ]
+
+    tt x = pure x
 
 
 readMaybe :: forall a. (Read a, Show a) => String -> First String
@@ -65,7 +71,9 @@ doCommand z = z
 
 
 escape :: String -> String
-escape = replace "!!!!!" "\\nnotes "
+escape = replace "\\n" "\n"
+       . replace "!!!!!" "\\nnotes "
+       . ("options space=15 font-size=18\\n" ++)
        . addPreamble
        . replace "\n" " "
        . unlines

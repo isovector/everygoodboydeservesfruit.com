@@ -6,56 +6,128 @@ comments: true
 tags: foo, bar
 ---
 
+Let's get you up and running. Today we'll talk about enough of the very basics
+to get you to a point where you can play music with other people. It's not going
+to be award-winning by any means, but it'll be *enough.*
 
-> Perhaps the most fundamental approach to improvisation emphasizes rhythm,
-> commonly known in the jazz community as time or time-feel.
->
-> -Paul F. Berliner, Thinking in Jazz
+Get started first; get amazing later.
 
-> I hear rhythms, mostly, and then I put notes to them.
->
-> -Dizzy Gillespie
-
-It's said that music is made up of three fundamental pieces---the rhythm, the
-harmony, and the melody. If you had asked me a month ago which of these was the
-most important, I'd unhesitatingly say "the melody."
-
-I was wrong. It's the rhythm. Music without melody is sorta boring, but music
-without rhythm isn't music at all---it's just noise.
-
-When I began seriously studying music, I couldn't hold a beat to save my life. A
-lifetime of playing classical music meant that *continuity* was never as
-important to me as *playing the right notes.* As such, whenever I screwed up,
-I'd stop and start again from the top. As you can imagine, this was not
-particularly helpful for my sense of rhythm.
-
-Do you know what was? Playing with the metronome. A lot.
-
-> You should have the metronome on, eyes closed, standing up and getting inside
-> of that pulse like you could eat it, chew it, punch it, sweat it. Feel it like
-> it’s right there, like it’s tangible.
->
-> To do this requires that you never practice without a metronome.
->
-> For roughly 15 years I have never picked up a guitar without a metronome on,
-> and now, to me, the sound of the metronome is the sound of practicing.
->
-> -Brian Baker
-
-```protip
-Starting today, *every time you practice,* use the metronome for the entire
-session.
-```
-
-It's amazing what having the right groove can do to a song. I was ignoring this
-for the two years I was teaching myself guitar. Even if you're playing the right
-chords, it just doesn't sound like the right song until the beat is in place.
-
-So focus on the groove.
+You'll need to know the following chords:
 
 $$
-X-X-X-X/4 |
-X-X/4 :8 X-X-X/4 ^3^ :q X/4 |
-:8 ## X/4 :q X/4 ## :8 X-X-X/4 ^3^
+:w
+!Chord' (Maj G)
+|
+!Chord' (Maj D)
+|
+!Chord' (Min E)
+|
+!Chord' (Maj C)
+!AnnotateBars [Maj G, Maj D, Min E, Maj C]
+$$
+
+The chords $Maj G$, $Maj D$ and $Maj C$ are pronounced "G major," "D major" and
+"C major" respectively. $Min E$ is called "E minor." We'll discuss where these
+chords come from and what they mean another time; today it's sufficient to just
+memorize them.
+
+Popular music is often transcribed in the form of chord sheets. A good place to
+find music for anything you're looking for is [Ultimate-Guitar.Com][chords].
+Don't let the word "guitar" fool you---the music is the same for every
+instrument!
+
+[chords]: https://www.ultimate-guitar.com/
+
+Today we'll be looking at the song [Wagon Wheel][wagon], whose chord sheet looks
+like this:
+
+[wagon]:
+
+```chords
+G | D | Em | C
+G | D | C
+```
+
+Each of the vertical lines corresponds to a bar, and so this chord sheet means
+to play one bar of $Maj G$, then one bar of $Maj D$, etc. When you get to the
+end, start again at the beginning. Rinse and repeat while singing until you run
+out of words.
+
+Chord sheets are intentionally terse; they offer a very rough guideline of how
+the song should be played, but don't really tell you how to do it. This is the
+primary skill we'll be developing throughout the next few lessons.
+
+Today, however, we'll just hammer out the chord in four quarter notes for each
+bar. Let's interpret the chord sheet above as the following:
+
+$$
+!Preamble Treble (Just (4, 4)) Nothing
+:q
+!Replicate 4 (Chord' (Maj G))
+|
+!Replicate 4 (Chord' (Maj D))
+\n
+!Preamble Treble Nothing Nothing
+!Replicate 4 (Chord' (Min E))
+|
+!Replicate 4 (Chord' (Maj C))
+\n
+!Preamble Treble Nothing Nothing
+!Replicate 4 (Chord' (Maj G))
+|
+!Replicate 4 (Chord' (Maj D))
+\n
+!Preamble Treble Nothing Nothing
+!Replicate 4 (Chord' (Maj C))
+=:|
+$$
+
+Congratulations! You've now part of a *very exclusive* club of musicians who can
+play Wagon Wheel. Memorize these chord changes, and invite some friends over for
+a jam sesh.
+
+It might sound silly, but a huge portion of playing music is just this---knowing
+and playing the chord changes. The rest is just embellishment.
+
+So, what does embellishment look like? Really anything that adds some interest
+to the music. For example, we can break the chords:
+
+$$
+!Preamble Treble (Just (4, 4)) Nothing
+:q
+!Replicate 2 (Diddle (Maj G) 4 First [[0], [1, 2]])
+|
+!Replicate 2 (Diddle (Maj D) 4 First [[0], [1, 2]])
+\n
+!Preamble Treble Nothing Nothing
+!Replicate 2 (Diddle (Min E) 4 First [[0], [1, 2]])
+|
+!Replicate 2 (Diddle (Min E) 4 First [[0], [1, 2]])
+\n
+!Preamble Treble Nothing Nothing
+!Replicate 2 (Diddle (Maj G) 4 First [[0], [1, 2]])
+|
+!Replicate 2 (Diddle (Maj D) 4 First [[0], [1, 2]])
+\n
+!Preamble Treble Nothing Nothing
+!Replicate 2 (Diddle (Maj C) 4 First [[0], [1, 2]])
+=:|
+$$
+
+That's already sick, that. But you know what you wanna do with that right? You
+wanna put a bangin' donk on it:
+
+$$
+!Preamble Treble (Just (4, 4)) Nothing
+:q
+!Replicate 2 (Diddle (Maj G) 4 First [[0], [1, 2]])
+|
+!Replicate 2 (Diddle (Maj D) 4 First [[0], [1, 2]])
+\n
+!Preamble Bass (Just (4, 4)) Nothing
+:h
+!Replicate 2 (Note G 2)
+|
+!Replicate 2 (Note D 3)
 $$
 

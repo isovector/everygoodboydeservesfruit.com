@@ -223,15 +223,21 @@ instance Show Degree where
 data Command
   = Chord (ChordV Note) Int Inversion
   | Chord' (ChordV Note)
-  | Note Note
+  | Note Note Int
   | Preamble Clef (Maybe (Int, Int)) (Maybe Note)
+  | AnnotateBars [ChordV Note]
+  | Replicate Int Command
+  | Diddle (ChordV Note) Int Inversion [[Int]]
   deriving (Eq, Ord, Read)
 
 instance Show Command where
   show (Chord' c)    = show c
   show (Chord c _ _) = show c
-  show (Note n)      = show n
+  show (Note n _)    = show n
   show (Preamble _ _ _ ) = error "don't show a preamble"
+  show (AnnotateBars _) = error "don't show an annotatebars"
+  show (Replicate _ _) = error "don't show a replicate"
+  show (Diddle _ _ _ _) = error "don't show a diddle"
 
 
 data Clef
@@ -268,11 +274,11 @@ instance Applicative Modified where
 instance Show a => Show (ChordV a) where
   show (Maj a)     = show a
   show (Maj7C a)    = show a ++ "Δ"
-  show (Min7C a)    = show a ++ "-7"
+  show (Min7C a)    = show a ++ "m7"
   -- show (MinMaj a)  = show a ++ "Δ-"
   show (Dom7 a)    = show a ++ "7"
   -- show (Sus a)     = show a ++ "sus"
-  show (Min a)     = show a ++ "-"
+  show (Min a)     = show a ++ "m"
   show (Dim a)     = show a ++ "∅"
   -- show (Mod x c)   = show c ++ " " ++ show x
   -- show (Slash c a) = show c ++ "/" ++ show a
@@ -313,9 +319,13 @@ data Interval
   | Maj2
   | Min3
   | Maj3
+  -- | Dim4
   | Perf4
-  | Tritone
+  -- | Aug4
+  | Dim5
+  -- | Dim5
   | Perf5
+  -- | Aug5
   | Min6
   | Maj6
   | Min7
@@ -329,27 +339,33 @@ instance Show Interval where
   show Maj2 = "M2"
   show Min3 = "m3"
   show Maj3 = "M3"
-  show Perf4 = "P4"
-  show Tritone = "TT"
-  show Perf5 = "P5"
+  -- show Dim4 = "4°"
+  show Perf4 = "4"
+  -- show Aug4 = "4+"
+  show Dim5 = "5°"
+  show Perf5 = "5"
+  -- show Aug5 = "5+"
   show Min6 = "m6"
   show Maj6 = "M6"
   show Min7 = "m7"
   show Maj7 = "M7"
 
 intervalSize :: Interval -> Roman
-intervalSize Unison  = I
-intervalSize Min2    = II
-intervalSize Maj2    = II
-intervalSize Min3    = III
-intervalSize Maj3    = III
-intervalSize Perf4   = IV
-intervalSize Tritone = V
-intervalSize Perf5   = V
-intervalSize Min6    = VI
-intervalSize Maj6    = VI
-intervalSize Min7    = VII
-intervalSize Maj7    = VII
+intervalSize Unison = I
+intervalSize Min2   = II
+intervalSize Maj2   = II
+intervalSize Min3   = III
+intervalSize Maj3   = III
+-- intervalSize Dim4   = IV
+intervalSize Perf4  = IV
+-- intervalSize Aug4   = IV
+intervalSize Dim5  = V
+intervalSize Perf5  = V
+-- intervalSize Aug5   = V
+intervalSize Min6   = VI
+intervalSize Maj6   = VI
+intervalSize Min7   = VII
+intervalSize Maj7   = VII
 
 add :: forall a. (Enum a, Bounded a) => a -> a -> a
 add a b = toEnum . modular (fromEnum (maxBound @a) + 1) $ fromEnum a + fromEnum b
@@ -376,7 +392,7 @@ notesOf (Min c)   = interval c <$> [Unison, Min3, Perf5]
 notesOf (Maj7C c) = interval c <$> [Unison, Maj3, Perf5, Maj7]
 notesOf (Min7C c) = interval c <$> [Unison, Min3, Perf5, Min7]
 notesOf (Dom7 c)  = interval c <$> [Unison, Maj3, Perf5, Min7]
-notesOf (Dim c)   = interval c <$> [Unison, Min3, Tritone]
+notesOf (Dim c)   = interval c <$> [Unison, Min3, Dim5]
 
 inOctaves :: Int -> [Note] -> [(Note, Int)]
 inOctaves _ [] = []
@@ -400,14 +416,11 @@ instance Engrave Clef where
 instance Engrave Command where
   engrave (Chord' c) = engrave $ Chord c 4 First
   engrave (Chord c o i)
-      = ('(' :)
-      . (++ ")")
-      . intercalate "."
-      . fmap engrave
+      = engraveChord
       . inOctaves o
       . invert i
       $ notesOf c
-  engrave (Note n) = engrave (n, 4 :: Int)
+  engrave (Note n o) = engrave (n, o :: Int)
   engrave (Preamble c ts key) =
     mconcat
       [ "tabstave notation=true tablature=false clef="
@@ -416,4 +429,18 @@ instance Engrave Command where
       , maybe "" (\k -> [qc| key={uglyShowNote k}|]) key
       , "!!!!!"
       ]
+  engrave (AnnotateBars bs) =
+    mconcat
+      [ "\\ntext :w,"
+      , intercalate ",|," (fmap show bs)
+      , ",|"
+      ]
+  engrave (Replicate n c) = foldMap engrave $ replicate n c
+  engrave (Diddle c o i d) =
+    let notes = inOctaves o . invert i $ notesOf c
+     in foldMap (engraveChord . fmap (notes !!)) d
+
+engraveChord :: [(Note, Int)] -> String
+engraveChord = ('(' :) . (++ ")") . intercalate "." . fmap engrave
+
 
