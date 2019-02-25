@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveDataTypeable  #-}
 {-# LANGUAGE DeriveFunctor       #-}
 {-# LANGUAGE DeriveGeneric       #-}
 {-# LANGUAGE FlexibleInstances   #-}
@@ -11,6 +12,7 @@
 
 module Music.Types where
 
+import Data.Data
 import Data.Bool (bool)
 import Data.List (intercalate)
 import Debug.Trace
@@ -57,7 +59,7 @@ data Note
   | B
   | Bs
   | Bss
-  deriving (Eq, Ord, Enum, Bounded, Generic, Read)
+  deriving (Eq, Ord, Enum, Bounded, Generic, Read, Data)
 
 toNoteClass :: Note -> Roman
 toNoteClass C   = I
@@ -117,6 +119,14 @@ instance Show Note where
 
 uglyShowNote :: Note -> String
 uglyShowNote = foldNote show (++ "b") (++ "#")
+
+showAdjustment :: Int -> String
+showAdjustment 0 = "n"
+showAdjustment 1 = "#"
+showAdjustment 2 = "##"
+showAdjustment (-1) = "b"
+showAdjustment (-2) = "bb"
+showAdjustment _ = error "bad adj"
 
 -- TODO(sandy): flats are broken
 instance Engrave Note where
@@ -181,21 +191,23 @@ semitonesAwayFromC VII = 11
 
 
 data Accidental = Flat | Natural | Sharp
-  deriving (Eq, Ord, Enum, Bounded, Generic, Read)
+  deriving (Eq, Ord, Enum, Bounded, Generic, Read, Data)
 
 instance Show Accidental where
   show Flat    = "♭"
   show Natural = "♮"
   show Sharp   = "♯"
 
+instance Semigroup Accidental where
+  (<>) Flat    Flat    = error "i told you we needed double flats"
+  (<>) Flat    Sharp   = Natural
+  (<>) Sharp   Flat    = Natural
+  (<>) Sharp   Sharp   = error "i told you we needed double sharps"
+  (<>) Natural a       = a
+  (<>) a       Natural = a
+
 instance Monoid Accidental where
   mempty = Natural
-  mappend Flat    Flat    = error "i told you we needed double flats"
-  mappend Flat    Sharp   = Natural
-  mappend Sharp   Flat    = Natural
-  mappend Sharp   Sharp   = error "i told you we needed double sharps"
-  mappend Natural a       = a
-  mappend a       Natural = a
 
 
 data Degree
@@ -207,7 +219,7 @@ data Degree
   | Eleven
   | Thirteen
   | Fifteen
-  deriving (Eq, Ord, Enum, Bounded, Read)
+  deriving (Eq, Ord, Enum, Bounded, Read, Data)
 
 instance Show Degree where
   show Four     = "4"
@@ -228,7 +240,7 @@ data Command
   | AnnotateBars [ChordV Note]
   | Replicate Int Command
   | Diddle (ChordV Note) Int Inversion [[Int]]
-  deriving (Eq, Ord, Read)
+  deriving (Eq, Ord, Read, Data)
 
 instance Show Command where
   show (Chord' c)    = show c
@@ -243,7 +255,7 @@ instance Show Command where
 data Clef
   = Treble
   | Bass
-  deriving (Eq, Ord, Read, Show)
+  deriving (Eq, Ord, Read, Show, Data)
 
 
 data ChordV a
@@ -258,11 +270,11 @@ data ChordV a
   -- | Alt (ChordV a)
   -- | Mod (Modified Degree) (ChordV a)
   -- | Slash (ChordV a) a
-  deriving (Eq, Ord, Functor, Generic, Read)
+  deriving (Eq, Ord, Functor, Generic, Read, Data)
 
 
 data Modified a = Modified Accidental a
-  deriving (Eq, Ord, Functor, Generic, Read)
+  deriving (Eq, Ord, Functor, Generic, Read, Data)
 
 instance Show a => Show (Modified a) where
   show (Modified fs d) = show fs ++ show d
@@ -293,12 +305,12 @@ instance Show a => Show (ChordV a) where
 --   | Mixolydian
 --   | Aeolian
 --   | Locrian
---   deriving (Eq, Ord, Enum, Show, Generic)
+--   deriving (Eq, Ord, Enum, Show, Generic, Data)
 
 -- data Harmony
 --   = MajorScale
 --   | MelodicMinorScale
---   deriving (Eq, Ord, Enum, Show, Generic)
+--   deriving (Eq, Ord, Enum, Show, Generic, Data)
 
 data Roman
   = I
@@ -308,10 +320,10 @@ data Roman
   | V
   | VI
   | VII
-  deriving (Eq, Ord, Enum, Show, Generic, Bounded, Read)
+  deriving (Eq, Ord, Enum, Show, Generic, Bounded, Read, Data)
 
 data Inversion = First | Second | Third | Fourth
-  deriving (Eq, Ord, Show, Enum, Bounded, Generic, Read)
+  deriving (Eq, Ord, Show, Enum, Bounded, Generic, Read, Data)
 
 data Interval
   = Unison
@@ -330,7 +342,7 @@ data Interval
   | Maj6
   | Min7
   | Maj7
-  deriving (Eq, Ord, Enum, Bounded, Generic, Read)
+  deriving (Eq, Ord, Enum, Bounded, Generic, Read, Data)
 
 
 instance Show Interval where
@@ -369,6 +381,17 @@ intervalSize Maj7   = VII
 
 add :: forall a. (Enum a, Bounded a) => a -> a -> a
 add a b = toEnum . modular (fromEnum (maxBound @a) + 1) $ fromEnum a + fromEnum b
+
+adjustmentToAccidental :: Int -> Accidental
+adjustmentToAccidental (-1) = Flat
+adjustmentToAccidental 0 = Natural
+adjustmentToAccidental 1 = Sharp
+adjustmentToAccidental _ = error "DONT"
+
+accidentalToAdjustment :: Accidental -> Int
+accidentalToAdjustment Flat = -1
+accidentalToAdjustment Natural = 0
+accidentalToAdjustment Sharp = 1
 
 
 adjustment :: Note -> Int
@@ -439,6 +462,9 @@ instance Engrave Command where
   engrave (Diddle c o i d) =
     let notes = inOctaves o . invert i $ notesOf c
      in foldMap (engraveChord . fmap (notes !!)) d
+
+baseNote :: Note -> Note
+baseNote = fromNoteClass . toNoteClass
 
 engraveChord :: [(Note, Int)] -> String
 engraveChord [] = "##"

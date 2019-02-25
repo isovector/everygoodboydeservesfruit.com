@@ -6,7 +6,6 @@
 
 module MusicCompiler (musicReader) where
 
-import Control.Monad.Catch
 import Data.Char (isSpace)
 import Data.Coerce (coerce)
 import Data.List (isInfixOf)
@@ -17,12 +16,14 @@ import Generics.SYB
 import Music.Types (engrave, Command (..), Note, ChordV, Roman, Interval)
 import Text.InterpolatedString.Perl6 (qc)
 import Text.Pandoc hiding (Inline (Note))
+import SitePipe.Readers
+import Data.Text (pack)
 
 
 musicReader :: String -> IO String
 musicReader s = do
     mkPandocReaderWith
-        readMarkdown
+        (fmap (. pack) readMarkdown)
         (fmap (fmap $ everywhere $ mkT inline) $ everywhereM $ mkM tt)
         pandocToHTML s
   where
@@ -86,30 +87,4 @@ addPreamble :: String -> String
 addPreamble s
   | "!!!!!" `isInfixOf` s = s
   | otherwise = "tabstave notation=true tablature=false clef=treble!!!!!" ++ s
-
-
-mkPandocReaderWith
-    :: (ReaderOptions -> String -> Either PandocError Pandoc)
-    -> (Pandoc -> IO Pandoc)
-    -> (Pandoc -> String)
-    -> String
-    -> IO String
-mkPandocReaderWith pReader transformer writer content =
-  fmap writer $ transformer =<< runPandocReader (pReader def) content
-
-
-pandocToHTML :: Pandoc -> String
-pandocToHTML = writeHtmlString $
-  def { writerHighlight = True }
-
-
-runPandocReader
-    :: (MonadThrow m)
-    => (String -> Either PandocError Pandoc)
-    -> String
-    -> m Pandoc
-runPandocReader panReader source =
-  case panReader source of
-    Left err -> throwM err
-    Right pandoc -> return pandoc
 

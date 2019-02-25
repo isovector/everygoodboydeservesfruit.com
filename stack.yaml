@@ -1,15 +1,9 @@
 flags: {}
 packages:
 - '.'
-- location:
-    git: https://github.com/isovector/circuitry.git
-    commit: 320aef8a27e498d5c3df96c94563ec82c53290b3
-  extra-dep: true
+- '../SitePipe'
 extra-deps:
 - datetime-0.3.1
 - strptime-1.0.10
-- sitepipe-0.3.0.0
-- lens-4.15.4
-- lens-aeson-1.0.2
-- profunctors-5.2.2
-resolver: lts-9.0
+resolver: lts-13.0
+allow-newer: true
