@@ -21,7 +21,6 @@ import           Data.List (intercalate)
 import qualified Data.Map as M
 import           Data.Maybe
 import           Data.Proxy
-import           Data.Semigroup
 import           Data.Typeable
 import           GHC.Generics
 import           Generics.SYB hiding (Generic)
@@ -180,23 +179,27 @@ drawTimeSig :: JS Stave -> (Int, Int) -> JSM ()
 drawTimeSig s (t, b) = emit [qc|{s}.addTimeSignature("{t}/{b}");|]
 
 
-drawElement :: Element -> JSM (JS StaveNote)
-drawElement (ENote n o d) = drawNotes [(n, o)] d
+drawElement :: Element -> JSM [JS StaveNote]
+drawElement (ENote n o d) = fmap pure $ drawNotes False [(n, o)] d
 drawElement (EChord c o i [(ns, d)]) =
   let chordNotes = inOctaves o $ invert i $ notesOf c
       notes = fmap (chordNotes !!) ns
-   in drawNotes notes d
+   in fmap pure $ drawNotes False notes d
+drawElement (EChord c o i ns) =
+  fmap join . traverse drawElement $ fmap (\n -> EChord c o i [n]) ns
+drawElement (ERest d) = fmap pure $ drawNotes True [(B, 4)] d
+drawElement (EGroup es) = fmap join $ traverse drawElement es
 
 
-drawNotes :: [(Note, Int)] -> Dur -> JSM (JS StaveNote)
-drawNotes notes d = do
+drawNotes :: Bool -> [(Note, Int)] -> Dur -> JSM (JS StaveNote)
+drawNotes rest notes d = do
   v <- freshName
   let jsNotes = intercalate "\",\""
               $ fmap (\(n, o) -> [qc|{uglyShowNote n}/{o}|]) notes
   emit $ mconcat
     [ [qc|var {v} = new VF.StaveNote(|]
     , "{"
-    , [qc|keys: ["{jsNotes}"], duration: "{d}"|]
+    , [qc|keys: ["{jsNotes}"], duration: "{d}{bool "" "r" rest}"|]
     , "});"
     ]
   doAccidentals v $ fmap fst notes
@@ -212,7 +215,7 @@ drawVoice stave sns = do
   v <- freshName
   let sns' = intercalate "," $ fmap show sns
   emit [qc|var {v} = new VF.Voice();|]
-  emit [qc|{v}.addTickables({sns'});|]
+  emit [qc|{v}.addTickables([{sns'}]);|]
 
   fm <- freshName @Formatter
   emit [qc|var {fm} = new VF.Formatter().joinVoices([{v}]).format([{v}], 400);|]
@@ -239,24 +242,38 @@ agrees m n =
 accidentalsForKey :: Note -> M.Map Note Int
 accidentalsForKey c =
   let notes = interval c <$> [Unison, Maj2, Maj3, Perf4, Perf5, Maj6, Maj7]
-   in M.fromList . fmap (\x -> ( baseNote x
-                               , adjustment x))
-                 $ filter ((/= 0) . adjustment) notes
+   in M.fromList
+    . fmap (\x -> ( baseNote x
+                  , adjustment x
+                  )
+           )
+    $ filter ((/= 0) . adjustment) notes
 
 
 drawStave :: Stave -> JSM (JS Stave)
 drawStave (Stave clef key timesig e) = do
   v <- freshName
   emit [qc|var {v} = new VF.Stave(10, 40, 400);|]
-  for_ clef $ drawClef v
+  for_ clef    $ drawClef v
   for_ timesig $ drawTimeSig v
-  for_ key $ \k -> do
+  for_ key     $ \k -> do
     modify $ field @"jssAccidentals" .~ accidentalsForKey k
     -- drawKey v k
 
   emitDraw v
 
   sn <- drawElement e
-  drawVoice v [sn]
+  drawVoice v sn
   pure v
+
+main :: IO ()
+main = putStrLn
+     . runJSM
+     . drawStave
+     . withTimeSig 4 4
+     . withKey C
+     . withClef Treble
+     . bars
+     . dur D4
+     $ chord (Maj D) 4 Second <> chord (Min D) 4 Third <> rest <> rest
 
