@@ -1,0 +1,11 @@
+---
+layout: post
+title: job2
+date: 2019-02-26 12:26
+comments: true
+tags: foo, bar
+---
+
+```music
+treble G 4/4 Abm7 Abm7> Abm7>> Abm7>>>
+```
