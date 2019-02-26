@@ -54,6 +54,7 @@ data Element
   = EChord (ChordV Note) Int Inversion [([Int], Dur)]
   | ENote Note Int Dur
   | ERest Dur
+  | ERhythm Dur
   | EGroup [Element]
   -- ETranspose
   deriving (Eq, Ord, Show, Read, Data, Typeable)
@@ -208,7 +209,23 @@ drawElement (EChord c o i [(ns, d)]) =
 drawElement (EChord c o i ns) =
   fmap join . traverse drawElement $ fmap (\n -> EChord c o i [n]) ns
 drawElement (ERest d) = fmap pure $ drawNotes True [(B, 4)] d
+drawElement (ERhythm d) = fmap pure $ drawRhythm d
 drawElement (EGroup es) = fmap join $ traverse drawElement es
+
+drawRhythm :: Dur -> JSM (JS StaveNote)
+drawRhythm d = do
+  v <- freshName
+  emit $ mconcat
+    [ [qc|var {v} = new VF.StaveNote(|]
+    , "{"
+    , [qc|keys: ["X/4"], duration: "{d}"|]
+    , "});"
+    ]
+  case d of
+    Dotted _ -> emit [qc|{v}.addDotToAll();|]
+    _ -> pure ()
+
+  pure v
 
 
 drawNotes :: Bool -> [(Note, Int)] -> Dur -> JSM (JS StaveNote)
@@ -282,6 +299,7 @@ getActivity :: Element -> [Dur]
 getActivity (EChord _ _ _ d) = fmap snd d
 getActivity (ENote _ _ d)    = pure d
 getActivity (ERest d)        = pure d
+getActivity (ERhythm d)      = pure d
 getActivity (EGroup g)       = g >>= getActivity
 
 

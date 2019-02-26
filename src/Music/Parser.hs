@@ -121,12 +121,18 @@ parseRest = do
   void $ char '%'
   ERest <$> parseDuration
 
+parseRhythm :: Parser Element
+parseRhythm = do
+  void $ char 'X'
+  ERhythm <$> parseDuration
+
 
 parseElement :: Parser Element
 parseElement = do
   es <- flip sepBy1 space $ asum
     [ try $ parseDiddle
     , parseNoteElement
+    , parseRhythm
     , parseRest
     ]
   pure $ mconcat es

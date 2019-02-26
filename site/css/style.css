@@ -74,13 +74,14 @@ nav > span > a:hover {
 }
 
 .main {
-  margin: 0 4em;
+  margin: 0 auto;
   padding: 0em 2em;
   padding-top: 2em;
   padding-bottom: 2em;
   text-align: justify;
   font-size: 14pt;
   background-color: white;
+  max-width: 60em;
 }
 
 article > p {
