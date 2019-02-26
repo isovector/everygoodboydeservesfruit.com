@@ -33,9 +33,10 @@ particularly helpful for my sense of rhythm.
 Do you know what was? Playing with the metronome. A lot. Starting today, *every
 time you practice,* use the metronome for the entire session.
 
-Anyway. It's amazing what having the right groove can do to a song. I was ignoring this
-for the two years I was teaching myself guitar. Even if you're playing the right
-chords, it just doesn't sound like the right song until the beat is in place.
+Anyway. It's amazing what having the right groove can do to a song. I was
+ignoring this for the two years I was teaching myself guitar. Even if you're
+playing the right chords, it just doesn't sound like the right song until the
+beat is in place.
 
 Let's go back to our [Wagon Wheel][wagon] example from the other day. Because we
 were focusing only on getting the chords right, we were playing it with this
