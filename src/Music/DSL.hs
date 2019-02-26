@@ -28,6 +28,7 @@ newtype JS t = JS
 instance Show (JS t) where
   show = getJS
 
+
 data Stave
   = Stave (Maybe Clef) (Maybe Note) (Maybe (Int, Int)) Element
   | SGroup [Stave]
@@ -41,11 +42,13 @@ data Formatter deriving (Typeable)
 data Bar deriving (Typeable)
 data Beam deriving (Typeable)
 
+
 instance Semigroup Stave where
   SGroup s1 <> SGroup s2 = SGroup $ s1 <> s2
   SGroup s1 <> s2        = SGroup $ s1 ++ [s2]
   s1 <> SGroup s2        = SGroup $ s1 : s2
   s1 <> s2               = SGroup [s1, s2]
+
 
 data Element
   = EChord (ChordV Note) Int Inversion [([Int], Dur)]
@@ -54,6 +57,7 @@ data Element
   | EGroup [Element]
   -- ETranspose
   deriving (Eq, Ord, Show, Read, Data, Typeable)
+
 
 data Dur
   = D1
@@ -191,6 +195,10 @@ drawTimeSig :: JS Bar -> (Int, Int) -> JSM ()
 drawTimeSig s (t, b) = emit [qc|{s}.addTimeSignature("{t}/{b}");|]
 
 
+drawKeySig :: JS Bar -> Note -> JSM ()
+drawKeySig s n = emit [qc|{s}.addKeySignature("{n}");|]
+
+
 drawElement :: Element -> JSM [JS StaveNote]
 drawElement (ENote n o d) = fmap pure $ drawNotes False [(n, o)] d
 drawElement (EChord c o i [(ns, d)]) =
@@ -222,8 +230,8 @@ drawNotes isRest notes d = do
   pure v
 
 
-drawVoice :: Float -> JS Bar -> [JS StaveNote] -> JSM (JS Voice)
-drawVoice w stave sns = do
+drawVoice :: Int -> Float -> JS Bar -> [JS StaveNote] -> JSM (JS Voice)
+drawVoice x w stave sns = do
   vv <- freshName @[StaveNote]
   v <- freshName @Voice
   let sns' = intercalate "," $ fmap show sns
@@ -232,7 +240,9 @@ drawVoice w stave sns = do
   emit [qc|{v}.addTickables({vv});|]
 
   fm <- freshName @Formatter
-  emitQueue [qc|var {fm} = new VF.Formatter().joinVoices([{v}]).format([{v}], {w} - {stave}.getNoteStartX());|]
+  case x of
+    0 -> emitQueue [qc|var {fm} = new VF.Formatter().joinVoices([{v}]).format([{v}], {w} - {stave}.getNoteStartX());|]
+    _ -> emitQueue [qc|var {fm} = new VF.Formatter().joinVoices([{v}]).format([{v}], {w});|]
   emitQueue [qc|{v}.draw({context}, {stave});|]
 
   beam <- freshName @Beam
@@ -300,23 +310,39 @@ groupMono f t as =
    in a : groupMono f t b
 
 
-drawStave :: Stave -> JSM ()
+drawStave :: Stave -> JSM Int
 drawStave (SGroup _) = undefined
 drawStave (Stave clef key timesig e) = do
-  bs <- drawBars 32 e
+  (bs, h) <- drawBars 32 e
   let v = head bs
 
   for_ clef    $ drawClef v
   for_ timesig $ drawTimeSig v
   for_ key     $ \k -> do
+    drawKeySig v k
     modify $ field @"jssAccidentals" .~ accidentalsForKey k
-    -- drawKey v k
+  pure h
+
+
+drawEverythingYo :: String -> Stave -> JSM ()
+drawEverythingYo divName s = do
+  emit [qc|
+var VF = Vex.Flow;
+var div = document.getElementById("{divName}")
+var renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
+renderer.resize(620, 500);
+var {context} = renderer.getContext();
+{context}.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
+|]
+  h <- drawStave s
+  emit [qc|renderer.resize(620, {firstStave + staveHeight * h})|]
 
 
 ------------------------------------------------------------------------------
 -- | How big we assume each activity is, in pixels
 activitySize :: Int
-activitySize = 35
+activitySize = 45
+
 
 ------------------------------------------------------------------------------
 -- | How wide we assume each system is, in pixels
@@ -334,42 +360,37 @@ buildSystems w dsq e =
         acts
 
 
-drawBars :: DSQ -> Element -> JSM [JS Bar]
+spaceFirstBar :: Int -> Int
+spaceFirstBar = round . (* id @Double 1.5) . fromIntegral
+
+staveHeight :: Int
+staveHeight = 110
+
+
+firstStave :: Int
+firstStave = 40
+
+
+drawBars :: DSQ -> Element -> JSM ([JS Bar], Int)
 drawBars dsq e = do
   let systems = buildSystems systemWidth dsq e
-  fmap join $ for (zip [0..] systems) $ \(y :: Int, row) -> do
-    let totalSize = getSum . foldMap Sum $ fmap snd row
+  fmap (, length systems) $ fmap join $ for (zip [0..] systems) $ \(y :: Int, row) -> do
+    let totalSize = getSum . foldMap Sum $ fmap snd row & bool id (_head %~ spaceFirstBar) (y == 0)
         getWidth relSize = fromIntegral @_ @Float systemWidth
                          * fromIntegral relSize
                          / fromIntegral totalSize
-    let widths = fmap (getWidth . snd) row
+    let widths = fmap (getWidth . snd) $ row & bool id (_head . _2 %~ spaceFirstBar) (y == 0)
         startXs = fmap (getSum . foldMap Sum) $ inits widths
         row' = zip (fmap fst row) $ zip startXs widths
-    for row' $ \(bar, (x, w)) -> do
+    for (zip [0..] row') $ \(x, (bar, (xpos, w))) -> do
       -- TODO(sandy): reset key on each bar
       v <- freshName
-      emit [qc|var {v} = new VF.Stave({10 + x}, {40 + y * 110}, {w});|]
+      emit [qc|var {v} = new VF.Stave({10 + xpos}, {firstStave + y * staveHeight}, {w});|]
       emitDraw v
 
       sn <- drawElement bar
-      void $ drawVoice w v sn
+      void $ drawVoice x w v sn
       pure v
-
-
-
-main :: IO ()
-main = writeFile "yes.js"
-     . runJSM
-     . drawStave
-     . withTimeSig 4 4
-     . withKey C
-     . withClef Treble
-     . bars
-     . dur D16
-     . mconcat
-     . replicate 16
-     $ chord (Maj D) 4 Second <> chord (Min D) 4 Third <> rest <> rest
-
 
 
 splitBars :: DSQ -> Element -> [Element]

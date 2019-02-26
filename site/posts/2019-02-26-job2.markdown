@@ -7,5 +7,22 @@ tags: foo, bar
 ---
 
 ```music
-treble G 4/4 Abm7 Abm7> Abm7>> Abm7>>>
+treble G 8/3 Cm7 Cm7> Cm7>> Cm7>>> G7[0,1,23,3]:4 G7[0,0,1,1]:8 %:2
+Cm7 Cm7> Cm7>> Cm7>>> G7[0,1,23,3]:4 G7[0,0,1,1]:8 %:2
 ```
+
+```music
+treble G 8/3 Cm7 Cm7> Cm7>> Cm7>>> G7[0,1,23,3]:4 G7[0,0,1,1]:8 %:2
+Cm7 Cm7> Cm7>> Cm7>>> G7[0,1,23,3]:4 G7[0,0,1,1]:8 %:2
+```
+
+```music
+treble G 8/3 Cm7 Cm7> Cm7>> Cm7>>> G7[0,1,23,3]:4 G7[0,0,1,1]:8 %:2
+Cm7 Cm7> Cm7>> Cm7>>> G7[0,1,23,3]:4 G7[0,0,1,1]:8 %:2
+```
+
+```chords
+G | D | Em | C
+G | D | C
+```
+

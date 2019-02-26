@@ -132,3 +132,38 @@ parseElement = do
   pure $ mconcat es
 
 
+parseClef :: Parser (Maybe Clef)
+parseClef = optional $ asum
+  [ Treble <$ string "treble" <* space
+  , Bass   <$ string "bass"   <* space
+  ]
+
+
+parseKey :: Parser (Maybe Note)
+parseKey = optional $ parseNote <* space
+
+
+parseTimeSignature :: Parser (Maybe (Int, Int))
+parseTimeSignature = optional $ do
+  t <- some $ oneOf ['0'..'9']
+  void $ char '/'
+  b <- some $ oneOf ['0'..'9']
+  space
+  pure (read t, read b)
+
+
+parseStave :: Parser Stave
+parseStave = do
+  c <- parseClef
+  k <- parseKey
+  t <- parseTimeSignature
+  e <- parseElement
+  pure $ Stave c k t e
+
+
+musicParser
+    :: String
+    -> String
+    -> Either (ParseErrorBundle String MusicError) String
+musicParser divName = fmap (runJSM . drawEverythingYo divName) . runParser parseStave ""
+
