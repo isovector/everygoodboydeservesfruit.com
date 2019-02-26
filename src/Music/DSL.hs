@@ -6,26 +6,18 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TupleSections       #-}
 {-# LANGUAGE TypeApplications    #-}
+{-# OPTIONS_GHC -Wall            #-}
 
 module Music.DSL where
 
-import           Control.Lens
-import           Control.Monad
+import           BasePrelude hiding (Category (..), Min (..))
+import           Control.Lens hiding (elementsOf)
 import           Control.Monad.State
-import           Data.Bool
-import           Data.Char
-import           Data.Data
-import           Data.Foldable
 import           Data.Generics.Product
-import           Data.List (intercalate)
 import qualified Data.Map as M
-import           Data.Maybe
-import           Data.Proxy
-import           Data.Typeable
-import           GHC.Generics
 import           Generics.SYB hiding (Generic)
 import           Music.Types
-import           Text.InterpolatedString.Perl6 (q, qc)
+import           Text.InterpolatedString.Perl6 (qc)
 
 
 newtype JS t = JS
@@ -46,6 +38,7 @@ data Line deriving (Typeable)
 data Voice deriving (Typeable)
 data StaveNote deriving (Typeable)
 data Formatter deriving (Typeable)
+data Bar deriving (Typeable)
 
 instance Semigroup Stave where
   SGroup s1 <> SGroup s2 = SGroup $ s1 <> s2
@@ -71,6 +64,21 @@ data Dur
   | Dotted Dur
   deriving (Eq, Ord, Read, Data, Typeable)
 
+type DSQ = Int
+
+byDSQ :: Dur -> DSQ
+byDSQ (Dotted D32) = error "too fine grained"
+byDSQ (Dotted d) =
+  let z = byDSQ d
+   in div z 2 + z
+byDSQ D32 = 1
+byDSQ D16 = 2
+byDSQ D8 = 4
+byDSQ D4 = 8
+byDSQ D2 = 16
+byDSQ D1 = 32
+
+
 instance Show Dur where
   show D1 = "w"
   show D2 = "h"
@@ -85,6 +93,9 @@ instance Semigroup Element where
   EGroup s1 <> s2        = EGroup $ s1 ++ [s2]
   s1 <> EGroup s2        = EGroup $ s1 : s2
   s1 <> s2               = EGroup [s1, s2]
+
+instance Monoid Element where
+  mempty = EGroup []
 
 
 withClef :: Clef -> Stave -> Stave
@@ -171,11 +182,11 @@ emitQueue :: String -> JSM ()
 emitQueue e = modify $ field @"jssDrawQueue" <>~ [e]
 
 
-drawClef :: JS Stave -> Clef -> JSM ()
+drawClef :: JS Bar -> Clef -> JSM ()
 drawClef s c = emit [qc|{s}.addClef("{show c & _head %~ toLower}");|]
 
 
-drawTimeSig :: JS Stave -> (Int, Int) -> JSM ()
+drawTimeSig :: JS Bar -> (Int, Int) -> JSM ()
 drawTimeSig s (t, b) = emit [qc|{s}.addTimeSignature("{t}/{b}");|]
 
 
@@ -192,14 +203,14 @@ drawElement (EGroup es) = fmap join $ traverse drawElement es
 
 
 drawNotes :: Bool -> [(Note, Int)] -> Dur -> JSM (JS StaveNote)
-drawNotes rest notes d = do
+drawNotes isRest notes d = do
   v <- freshName
   let jsNotes = intercalate "\",\""
               $ fmap (\(n, o) -> [qc|{uglyShowNote n}/{o}|]) notes
   emit $ mconcat
     [ [qc|var {v} = new VF.StaveNote(|]
     , "{"
-    , [qc|keys: ["{jsNotes}"], duration: "{d}{bool "" "r" rest}"|]
+    , [qc|keys: ["{jsNotes}"], duration: "{d}{bool "" "r" isRest}"|]
     , "});"
     ]
   doAccidentals v $ fmap fst notes
@@ -210,15 +221,15 @@ drawNotes rest notes d = do
   pure v
 
 
-drawVoice :: JS Stave -> [JS StaveNote] -> JSM (JS Voice)
-drawVoice stave sns = do
+drawVoice :: Float -> JS Bar -> [JS StaveNote] -> JSM (JS Voice)
+drawVoice w stave sns = do
   v <- freshName
   let sns' = intercalate "," $ fmap show sns
   emit [qc|var {v} = new VF.Voice();|]
   emit [qc|{v}.addTickables([{sns'}]);|]
 
   fm <- freshName @Formatter
-  emit [qc|var {fm} = new VF.Formatter().joinVoices([{v}]).format([{v}], 400);|]
+  emit [qc|var {fm} = new VF.Formatter().joinVoices([{v}]).format([{v}], {w});|]
 
   emitQueue [qc|{v}.draw({context}, {stave});|]
   pure v
@@ -227,7 +238,7 @@ drawVoice stave sns = do
 doAccidentals :: JS StaveNote -> [Note] -> JSM ()
 doAccidentals v notes = do
   accs <- gets jssAccidentals
-  for_ (zip [0..] notes) $ \(i, n) -> do
+  for_ (zip [0..] notes) $ \(i :: Int, n) -> do
     unless (agrees accs n) $ do
       let adj = adjustment n
       emit [qc|{v}.addAccidental({i}, new VF.Accidental("{showAdjustment adj}"));|]
@@ -250,30 +261,120 @@ accidentalsForKey c =
     $ filter ((/= 0) . adjustment) notes
 
 
-drawStave :: Stave -> JSM (JS Stave)
+getActivity :: Element -> [Dur]
+getActivity (EChord _ _ _ d) = fmap snd d
+getActivity (ENote _ _ d)    = pure d
+getActivity (ERest d)        = pure d
+getActivity (EGroup g)       = g >>= getActivity
+
+
+getDuration :: Element -> Sum Int
+getDuration = foldMap (Sum . byDSQ) . getActivity
+
+
+elementsOf :: Element -> [Element]
+elementsOf (EGroup e) = e
+elementsOf e          = [e]
+
+
+splitMono :: Monoid m => (m -> Bool) -> (a -> m) -> [a] -> ([a], [a])
+splitMono f t as = join (***) (fmap fst)
+                 . span (f . snd)
+                 . fmap (second $ foldMap t)
+                 . zip as
+                 . tail
+                 $ inits as
+
+
+groupMono :: Monoid m => (m -> Bool) -> (a -> m) -> [a] -> [[a]]
+groupMono _ _ [] = []
+groupMono f t as =
+  let (a, b) = splitMono f t as
+   in a : groupMono f t b
+
+
+drawStave :: Stave -> JSM ()
+drawStave (SGroup _) = undefined
 drawStave (Stave clef key timesig e) = do
-  v <- freshName
-  emit [qc|var {v} = new VF.Stave(10, 40, 400);|]
+  bs <- drawBars 32 e
+  let v = head bs
+
   for_ clef    $ drawClef v
   for_ timesig $ drawTimeSig v
   for_ key     $ \k -> do
     modify $ field @"jssAccidentals" .~ accidentalsForKey k
     -- drawKey v k
 
-  emitDraw v
 
-  sn <- drawElement e
-  drawVoice v sn
-  pure v
+------------------------------------------------------------------------------
+-- | How big we assume each activity is, in pixels
+activitySize :: Int
+activitySize = 35
+
+------------------------------------------------------------------------------
+-- | How wide we assume each system is, in pixels
+systemWidth :: Int
+systemWidth = 600
+
+
+buildSystems :: Int -> DSQ -> Element -> [[(Element, Int)]]
+buildSystems w dsq e =
+  let bs   = splitBars dsq e
+      acts = fmap (\x -> (x, (* activitySize) . length $ getActivity x)) bs
+   in groupMono
+        ((<= w) . getSum)
+        (Sum . snd)
+        acts
+
+
+drawBars :: DSQ -> Element -> JSM [JS Bar]
+drawBars dsq e = do
+  let systems = buildSystems systemWidth dsq e
+  fmap join $ for (zip [0..] systems) $ \(y :: Int, row) -> do
+    let totalSize = getSum . foldMap Sum $ fmap snd row
+        getWidth relSize = fromIntegral @_ @Float systemWidth
+                         * fromIntegral relSize
+                         / fromIntegral totalSize
+    let widths = fmap (getWidth . snd) row
+        startXs = fmap (getSum . foldMap Sum) $ inits widths
+        row' = zip (fmap fst row) $ zip startXs widths
+    for row' $ \(bar, (x, w)) -> do
+      -- TODO(sandy): reset key on each bar
+      v <- freshName
+      emit [qc|var {v} = new VF.Stave({10 + x}, {40 + y * 110}, {w});|]
+      emitDraw v
+
+      sn <- drawElement bar
+      void $ drawVoice w v sn
+      pure v
+
+
 
 main :: IO ()
-main = putStrLn
+main = writeFile "yes.js"
      . runJSM
      . drawStave
      . withTimeSig 4 4
      . withKey C
      . withClef Treble
      . bars
-     . dur D4
+     . mconcat
+     . replicate 16
      $ chord (Maj D) 4 Second <> chord (Min D) 4 Third <> rest <> rest
+
+
+
+splitBars :: DSQ -> Element -> [Element]
+splitBars _ e
+  | elementsOf e == [] = []
+splitBars dsqs e =
+  let (fit, dont) = splitMono ((<= dsqs) . getSum) getDuration $ elementsOf e
+      fitDur = getSum $ foldMap getDuration fit
+   in case (compare fitDur dsqs, listToMaybe dont) of
+        (LT, Just _n) -> error "not enough"
+          -- let (fill, remaining) = breakElement (dsqs - fitDur) n
+          --  in (EGroup $ fit ++ [fill])
+          --   : splitBars dsqs (EGroup $ remaining : dont)
+        (EQ, _) -> EGroup fit : splitBars dsqs (EGroup dont)
+        _ -> error "aghigdsi"
 
