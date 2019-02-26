@@ -232,7 +232,7 @@ drawVoice w stave sns = do
   emit [qc|{v}.addTickables({vv});|]
 
   fm <- freshName @Formatter
-  emit [qc|var {fm} = new VF.Formatter().joinVoices([{v}]).format([{v}], {w});|]
+  emitQueue [qc|var {fm} = new VF.Formatter().joinVoices([{v}]).format([{v}], {w} - {stave}.getNoteStartX());|]
   emitQueue [qc|{v}.draw({context}, {stave});|]
 
   beam <- freshName @Beam
@@ -367,7 +367,7 @@ main = writeFile "yes.js"
      . bars
      . dur D16
      . mconcat
-     . replicate 4
+     . replicate 16
      $ chord (Maj D) 4 Second <> chord (Min D) 4 Third <> rest <> rest
 
 
