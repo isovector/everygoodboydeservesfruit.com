@@ -39,6 +39,7 @@ data Voice deriving (Typeable)
 data StaveNote deriving (Typeable)
 data Formatter deriving (Typeable)
 data Bar deriving (Typeable)
+data Beam deriving (Typeable)
 
 instance Semigroup Stave where
   SGroup s1 <> SGroup s2 = SGroup $ s1 <> s2
@@ -223,15 +224,21 @@ drawNotes isRest notes d = do
 
 drawVoice :: Float -> JS Bar -> [JS StaveNote] -> JSM (JS Voice)
 drawVoice w stave sns = do
-  v <- freshName
+  vv <- freshName @[StaveNote]
+  v <- freshName @Voice
   let sns' = intercalate "," $ fmap show sns
+  emit [qc|var {vv} = [{sns'}];|]
   emit [qc|var {v} = new VF.Voice();|]
-  emit [qc|{v}.addTickables([{sns'}]);|]
+  emit [qc|{v}.addTickables({vv});|]
 
   fm <- freshName @Formatter
   emit [qc|var {fm} = new VF.Formatter().joinVoices([{v}]).format([{v}], {w});|]
-
   emitQueue [qc|{v}.draw({context}, {stave});|]
+
+  beam <- freshName @Beam
+  emit [qc|var {beam} = VF.Beam.generateBeams({vv});|]
+  emitQueue [qc|{beam}.forEach(beam => beam.setContext({context}).draw());|]
+
   pure v
 
 
@@ -358,8 +365,9 @@ main = writeFile "yes.js"
      . withKey C
      . withClef Treble
      . bars
+     . dur D16
      . mconcat
-     . replicate 16
+     . replicate 4
      $ chord (Maj D) 4 Second <> chord (Min D) 4 Third <> rest <> rest
 
 
