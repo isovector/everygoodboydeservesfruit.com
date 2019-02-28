@@ -14,17 +14,10 @@ Get started first; get amazing later.
 
 You'll need to know the following chords:
 
-$$
-:w
-!Chord' (Maj G)
-|
-!Chord' (Maj D)
-|
-!Chord' (Min E)
-|
-!Chord' (Maj C)
-!AnnotateBars [Maj G, Maj D, Min E, Maj C]
-$$
+```music
+treble C GM:1 DM:1 Em:1 CM:1
+```
+<!-- !AnnotateBars [Maj G, Maj D, Min E, Maj C] -->
 
 The chords $Maj G$, $Maj D$ and $Maj C$ are pronounced "G major," "D major" and
 "C major" respectively. $Min E$ is called "E minor." We'll discuss where these
@@ -60,27 +53,16 @@ primary skill we'll be developing throughout the next few lessons.
 Today, however, we'll just hammer out the chord in four quarter notes for each
 bar. Let's interpret the chord sheet above as the following:
 
-$$
-!Preamble Treble (Just (4, 4)) Nothing
-:q
-!Replicate 4 (Chord' (Maj G))
-|
-!Replicate 4 (Chord' (Maj D))
-\n
-!Preamble Treble Nothing Nothing
-!Replicate 4 (Chord' (Min E))
-|
-!Replicate 4 (Chord' (Maj C))
-\n
-!Preamble Treble Nothing Nothing
-!Replicate 4 (Chord' (Maj G))
-|
-!Replicate 4 (Chord' (Maj D))
-\n
-!Preamble Treble Nothing Nothing
-!Replicate 4 (Chord' (Maj C))
-=:|
-$$
+```music
+treble 4/4
+GM GM GM GM
+DM DM DM DM
+Em Em Em Em
+CM CM CM CM
+GM GM GM GM
+DM DM DM DM
+CM CM CM CM
+```
 
 Congratulations! You've now part of a *very exclusive* club of musicians who can
 play Wagon Wheel. Memorize these chord changes, and invite some friends over for
@@ -92,44 +74,30 @@ and playing the chord changes. The rest is just embellishment.
 So, what does embellishment look like? Really anything that adds some interest
 to the music. For example, we can break the chords:
 
-$$
-!Preamble Treble (Just (4, 4)) Nothing
-:q
-!Replicate 2 (Diddle (Maj G) 4 First [[0], [1, 2]])
-|
-!Replicate 2 (Diddle (Maj D) 4 First [[0], [1, 2]])
-\n
-!Preamble Treble Nothing Nothing
-!Replicate 2 (Diddle (Min E) 4 First [[0], [1, 2]])
-|
-!Replicate 2 (Diddle (Min E) 4 First [[0], [1, 2]])
-\n
-!Preamble Treble Nothing Nothing
-!Replicate 2 (Diddle (Maj G) 4 First [[0], [1, 2]])
-|
-!Replicate 2 (Diddle (Maj D) 4 First [[0], [1, 2]])
-\n
-!Preamble Treble Nothing Nothing
-!Replicate 2 (Diddle (Maj C) 4 First [[0], [1, 2]])
-=:|
-$$
+```music
+treble 4/4
+GM[0,12,0,12]
+DM[0,12,0,12]
+Em[0,12,0,12]
+CM[0,12,0,12]
+GM[0,12,0,12]
+DM[0,12,0,12]
+CM[0,12,0,12]
+```
 
 That's already sick, that. But you know what you wanna do with that right? You
 wanna put a bangin' donk on it:
 
-$$
-!Preamble Treble (Just (4, 4)) Nothing
-:q
-!Replicate 2 (Diddle (Maj G) 4 First [[0], [1, 2]])
-|
-!Replicate 2 (Diddle (Maj D) 4 First [[0], [1, 2]])
-\n
-!Preamble Bass (Just (4, 4)) Nothing
-:h
-!Replicate 2 (Note G 2)
-|
-!Replicate 2 (Note D 3)
-$$
+```music
+bass 4/4
+G2:2 G2:2
+D3:2 D3:2
+E3:2 E3:2
+C3:2 C3:2
+G2:2 G2:2
+D3:2 D3:2
+C3:2 C3:2
+```
 
 It's sort of silly how much better a little embellishment sounds already, isn't
 it? We'll progress from here by looking at small, simple adornments can be
