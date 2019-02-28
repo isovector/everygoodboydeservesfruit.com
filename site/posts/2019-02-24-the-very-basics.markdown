@@ -14,10 +14,15 @@ Get started first; get amazing later.
 
 You'll need to know the following chords:
 
+
 ```music
 treble C GM:1 DM:1 Em:1 CM:1
 ```
 <!-- !AnnotateBars [Maj G, Maj D, Min E, Maj C] -->
+
+```chords
+G | D | Em | C
+```
 
 The chords $Maj G$, $Maj D$ and $Maj C$ are pronounced "G major," "D major" and
 "C major" respectively. $Min E$ is called "E minor." We'll discuss where these
